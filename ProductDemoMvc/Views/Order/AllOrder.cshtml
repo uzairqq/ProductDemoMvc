@@ -1,0 +1,51 @@
+﻿@model OrderGridViewModel
+
+<div class="row">
+    <div class="col-sm-12">
+        <form asp-controller="Order" asp-action="Save" asp-route-returnurl="@ViewBag.ReturnUrl" method="post" class="form-horizontal" role="form">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Order.Name" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="Order.Name" class="form-control" />
+                    <span asp-validation-for="Order.Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Add" class="btn btn-default" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 table-responsive">
+        <table class="table table-bordered table-condensed table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Name</th>
+                    <th>Created On</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var index = 0; index < Model.Grid.Count; index++)
+                {
+                    var viewModel = Model.Grid[index];
+                    <tr>
+                        <td>@index</td>
+                        <td>@viewModel.Name</td>
+                        <td>@viewModel.CreatedOn.ToShortDateString()</td>
+                        <td>
+                            <a class="btn btn-primary" asp-controller="Product" asp-action="All" asp-route-orderId="@viewModel.Id">Get All Product</a>
+                            @*<button class="btn btn-primary" asp-controller="Product" asp-action="Add">Delete Products</button>*@
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

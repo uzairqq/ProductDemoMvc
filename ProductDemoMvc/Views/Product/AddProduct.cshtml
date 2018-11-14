@@ -1,0 +1,13 @@
+﻿@model ProductViewModel
+
+<Form enctype="multipart/form-data">
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <input type="text" asp-for="Name" />
+    </div>
+    <div class="form-group">
+        <label class="control-label">Image</label>
+        <input type="file" asp-for="Image" />
+    </div>
+    <button asp-action="Add" asp-controller="Product" ></button>
+</Form>

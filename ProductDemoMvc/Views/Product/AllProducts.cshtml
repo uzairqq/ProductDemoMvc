@@ -1,0 +1,115 @@
+﻿@model ProductGridViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+
+<input type="hidden" id="RequestVerificationToken"
+       name="RequestVerificationToken" value="@GetAntiXsrfRequestToken()">
+
+<div class="row">
+    <div class="col-sm-12">
+        <form id="addProduct" enctype="multipart/form-data" asp-controller="Product" asp-action="Add" asp-route-returnurl="@ViewBag.ReturnUrl" method="post" class="form-horizontal">
+            <input type="hidden" asp-for="Product.OrderId" name="OrderId"/>
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Product.Name" class="col-sm-2 control-label"></label>
+                <div class="col-sm-6">
+                    <input asp-for="Product.Name" name="Name" class="form-control" />
+                    <span asp-validation-for="Product.Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Product.Price" class="col-md-2 control-label"></label>
+                <div class="col-md-6">
+                    <input asp-for="Product.Price" name="Price" class="form-control" />
+                    <span asp-validation-for="Product.Price" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Image</label>
+                <div class="col-md-6">
+                    <input class="form-control" type="file" name="File" />
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Add" class="btn btn-default" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<div class="table-responsive">
+    <table class="table table-bordered table-condensed table-hover table-striped">
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var index = 0; index < Model.Grid.Count; index++)
+            {
+                var viewModel = Model.Grid[index];
+                <tr>
+                    <td>@index</td>
+                    <td>@viewModel.Name</td>
+                    <td>@viewModel.Price</td>
+                    @*<td>@viewModel.Image</td>*@
+                    <td>
+                        @*<button class="btn btn-primary" asp-controller="Product" asp-action="ViewAddProduct">Update</button>
+                        <button class="btn btn-primary" asp-controller="Product" asp-action="Delete">Delete Products</button>*@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+@section Scripts
+    {
+    <script>
+
+        $("form#formElement").submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData();
+            formData.append('Name', $("#Name").val());
+            formData.append('Price', $("#Price").val());
+            formData.append('file', $('input[type=file]')[0].files[0]);
+
+            $.ajaxPrefilter(function (options, originalOptions) {
+                if (options.type.toUpperCase() === "POST") {
+                    options.data = $.param($.extend(originalOptions.data,
+                        {
+                            'X-XSRF-TOKEN': document.getElementById('RequestVerificationToken').value
+                        }));
+                }
+            });
+
+            $.ajax({
+                url: '/Product/Add',
+                type: 'POST',
+                data: formData,
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,  // tell jQuery not to set contentType
+                success: function (data) {
+                    console.log(data);
+                    alert(data);
+                }
+            });
+        });
+
+
+    </script>
+}
